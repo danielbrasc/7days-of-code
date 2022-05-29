@@ -1,99 +1,127 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Filmes Populares</title>
+    <title>Filmes</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <header>
-      <h1>Filmes Populares</h1>
-
-      <div class="search-bar">
+    <main>
+      <h2>Filmes Populares</h2>
+      <div class="input-container">
         <input
           type="text"
-          name="search"
-          class="bar"
+          name="movie-name"
+          id="movie-name"
           placeholder="Digite algum filme para pesquisar..."
         />
-        <img src="assets/search-icon.svg" alt="Icone de uma lupa" />
+        <img
+          src="assets/search-icon.svg"
+          alt="Ícone de pesquisa"
+          class="searchIcon"
+        />
       </div>
-    </header>
-
-    <section class="filter-favorite-only">
-      <input type="checkbox" id="favorite-button" name="only-favorite-movies" />
-      <span class="text-checkbox">Mostrar meus filmes favoritos apenas</span>
-    </section>
-
-    <ul class="container">
-      <li class="movie">
-        <img src="assets/avengers-endgame.jpg" alt="Capa do filme" />
-        <div class="info">
-          <h2>Avengers Endgame (2019)</h2>
-          <div class="content">
-            <div class="star">
-              <img src="assets/star.svg" alt="Icone de uma estrela" />
-              <span class="text">9.2</span>
+      <div class="show-only-favorites">
+        <input type="checkbox" name="onlyFavorites" id="onlyFavorites" />
+        <label for="onlyFavorites">Mostrar meus filmes favoritos apenas</label>
+      </div>
+      <ul class="movies">
+        <li class="movie">
+          <div class="movie-informations">
+            <div class="movie-image">
+              <img
+                src="https://uauposters.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/2/0/201906131069-uau-posters-filmes-avengers-endgame-vingadores-ultimato.jpg"
+                alt="Avengers Endgame (2019)"
+              />
             </div>
-            <div class="heart">
-              <img src="assets/heart.svg" alt="Icone de um coração" />
-              <span class="text">Favoritar</span>
-            </div>
-          </div>
-        </div>
-        <p class="description">
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the industry's standard dummy text ever
-          since the 1500s, when an unknown printer took a galley of type and
-          scrambled it to make a type specimen book.
-        </p>
-      </li>
-      <li class="movie">
-        <img src="assets/avengers-endgame.jpg" alt="Capa do filme" />
-        <div class="info">
-          <h2>Avengers Endgame (2019)</h2>
-          <div class="content">
-            <div class="star">
-              <img src="assets/star.svg" alt="Icone de uma estrela" />
-              <span class="text">9.2</span>
-            </div>
-            <div class="heart">
-              <img src="assets/heart-filled.svg" alt="Icone de um coração" />
-              <span class="text">Favoritar</span>
+            <div class="movie-text">
+              <h4>Avengers Endgame (2019)</h4>
+              <div class="rating-favorites">
+                <div class="rating">
+                  <img src="assets/star.svg" alt="Ícone de uma estrela" />
+                  <span>9.2</span>
+                </div>
+                <div class="favorite">
+                  <img src="assets/heart.svg" alt="Ícone de um coração" />
+                  <span>Favoritar</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <p class="description">
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the industry's standard dummy text ever
-          since the 1500s, when an unknown printer took a galley of type and
-          scrambled it to make a type specimen book.
-        </p>
-      </li>
-      <li class="movie">
-        <img src="assets/avengers-endgame.jpg" alt="Capa do filme" />
-        <div class="info">
-          <h2>Avengers Endgame (2019)</h2>
-          <div class="content">
-            <div class="star">
-              <img src="assets/star.svg" alt="Icone de uma estrela" />
-              <span class="text">9.2</span>
+          <div class="movie-description">
+            <span
+              >Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever since the 1500s, when an unknown printer took a galley of
+              type and scrambled it to make a type specimen book.</span
+            >
+          </div>
+        </li>
+        <li class="movie">
+          <div class="movie-informations">
+            <div class="movie-image">
+              <img
+                src="https://uauposters.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/2/0/201906131069-uau-posters-filmes-avengers-endgame-vingadores-ultimato.jpg"
+                alt="Avengers Endgame (2019)"
+              />
             </div>
-            <div class="heart">
-              <img src="assets/heart.svg" alt="Icone de um coração" />
-              <span class="text">Favoritar</span>
+            <div class="movie-text">
+              <h4>Avengers Endgame (2019)</h4>
+              <div class="rating-favorites">
+                <div class="rating">
+                  <img src="assets/star.svg" alt="Ícone de uma estrela" />
+                  <span>9.2</span>
+                </div>
+                <div class="favorite">
+                  <img src="assets/heart-fill.svg" alt="Ícone de um coração" />
+                  <span>Favoritar</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <p class="description">
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the industry's standard dummy text ever
-          since the 1500s, when an unknown printer took a galley of type and
-          scrambled it to make a type specimen book.
-        </p>
-      </li>
-    </ul>
+          <div class="movie-description">
+            <span
+              >Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever since the 1500s, when an unknown printer took a galley of
+              type and scrambled it to make a type specimen book.</span
+            >
+          </div>
+        </li>
+        <li class="movie">
+          <div class="movie-informations">
+            <div class="movie-image">
+              <img
+                src="https://uauposters.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/2/0/201906131069-uau-posters-filmes-avengers-endgame-vingadores-ultimato.jpg"
+                alt="Avengers Endgame (2019)"
+              />
+            </div>
+            <div class="movie-text">
+              <h4>Avengers Endgame (2019)</h4>
+              <div class="rating-favorites">
+                <div class="rating">
+                  <img src="assets/star.svg" alt="Ícone de uma estrela" />
+                  <span>9.2</span>
+                </div>
+                <div class="favorite">
+                  <img src="assets/heart.svg" alt="Ícone de um coração" />
+                  <span>Favoritar</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="movie-description">
+            <span
+              >Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever since the 1500s, when an unknown printer took a galley of
+              type and scrambled it to make a type specimen book.</span
+            >
+          </div>
+        </li>
+      </ul>
+    </main>
   </body>
 </html>
