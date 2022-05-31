@@ -1,42 +1,23 @@
-const movieContainer = document.querySelector(".movies");
+import { api_key, base_url } from './env.js'
 
-const movies = [
-  {
-    image:
-      'https://uauposters.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/2/0/201906131069-uau-posters-filmes-avengers-endgame-vingadores-ultimato.jpg',
-    title: 'Avengers Endgame',
-    rating: 9.2,
-    year: 2019,
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
-    isFavorited: true
-  },
-  {
-    image:
-      'https://img.elo7.com.br/product/original/3FBA809/big-poster-filme-batman-2022-90x60-cm-lo002-poster-batman.jpg',
-    title: 'Batman',
-    rating: 9.2,
-    year: 2022,
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
-    isFavorited: false
-  },
-  {
-    image:
-      'https://upload.wikimedia.org/wikipedia/en/1/17/Doctor_Strange_in_the_Multiverse_of_Madness_poster.jpg',
-    title: 'Doctor Strange',
-    rating: 9.2,
-    year: 2022,
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
-    isFavorited: false
-  }
-]
+const movieContainer = document.querySelector(".movies")
 
 window.onload = function () {
-  movies.forEach(movie => renderMovie(movie))
+  getPopularMovies()
 }
 
-function renderMovie(movie) {
+async function getPopularMovies() {
+  let url = `https://api.themoviedb.org/3/movie/popular?api_key=${api_key}&language=en-US&page=1`
+  let response = await fetch(url);
+  const movies = await response.json();
 
-  const { title, image, rating, year, description, isFavorited } = movie;
+  movies.results.forEach((movie) => {
+    renderMovie(movie)
+  })
+}
+
+async function renderMovie(movie) {
+  const { title, poster_path: image, backdrop_path: backupImage, vote_average: rating, release_date: year, overview: description } = movie;
 
   const movieElement = document.createElement('li')
   movieElement.classList.add('movie')
@@ -48,7 +29,7 @@ function renderMovie(movie) {
   const movieImageContainer = document.createElement('div')
   movieImageContainer.classList.add('movie-image')
   const movieImage = document.createElement('img')
-  movieImage.src = image
+  movieImage.src = `${base_url}${image ? image : backupImage}`
   movieImage.alt = `${title} Poster`
   movieImageContainer.appendChild(movieImage)
   movieInformations.appendChild(movieImageContainer)
@@ -56,7 +37,7 @@ function renderMovie(movie) {
   const movieTextContainer = document.createElement('div')
   movieTextContainer.classList.add('movie-text')
   const movieTitle = document.createElement('h4')
-  movieTitle.textContent = `${movie.title} (${year})`
+  movieTitle.textContent = `${movie.title} (${year.slice(0, 4)})`
   movieTextContainer.appendChild(movieTitle)
   movieInformations.appendChild(movieTextContainer)
 
@@ -79,7 +60,7 @@ function renderMovie(movie) {
   const favorite = document.createElement('div')
   favorite.classList.add('favorite')
   const favoriteImage = document.createElement('img')
-  favoriteImage.src = isFavorited ? 'assets/heart-fill.svg' : 'assets/heart.svg'
+  favoriteImage.src = false ? 'assets/heart-fill.svg' : 'assets/heart.svg'
   favoriteImage.alt = 'Ícone de um coração'
   favoriteImage.classList.add('favorite-image')
   const favoriteText = document.createElement('span')
@@ -97,4 +78,4 @@ function renderMovie(movie) {
 
   movieElement.appendChild(movieInformations)
   movieElement.appendChild(movieDescriptionContainer)
-} 
+}
