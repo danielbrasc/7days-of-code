@@ -1,46 +1,66 @@
-const movieContainer = document.querySelector(".movies");
+import { api_key } from './environment/key.js'
 
-const movies = [
-  {
-    image:
-      'https://uauposters.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/2/0/201906131069-uau-posters-filmes-avengers-endgame-vingadores-ultimato.jpg',
-    title: 'Avengers Endgame',
-    rating: 9.2,
-    year: 2019,
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
-    isFavorited: true
-  },
-  {
-    image:
-      'https://img.elo7.com.br/product/original/3FBA809/big-poster-filme-batman-2022-90x60-cm-lo002-poster-batman.jpg',
-    title: 'Batman',
-    rating: 9.2,
-    year: 2022,
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
-    isFavorited: false
-  },
-  {
-    image:
-      'https://upload.wikimedia.org/wikipedia/en/1/17/Doctor_Strange_in_the_Multiverse_of_Madness_poster.jpg',
-    title: 'Doctor Strange',
-    rating: 9.2,
-    year: 2022,
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
-    isFavorited: false
+const moviesContainer = document.querySelector(".movies")
+const input = document.querySelector('input')
+const searchButton = document.querySelector('.searchIcon')
+
+searchButton.addEventListener('click', searchMovie)
+
+input.addEventListener('keyup', function (event) {
+  if (event.keyCode == 13) {
+    searchMovie()
+    return
   }
-]
+})
 
-window.onload = function () {
+async function searchMovie() {
+  const inputValue = input.value
+  if (!!inputValue) {
+    cleanAllMovies()
+    const movies = await searchMovieByName(inputValue)
+    movies.forEach(movie => renderMovie(movie))
+  } else {
+    cleanAllMovies()
+    const movies = await getPopularMovies()
+    movies.forEach(movie => renderMovie(movie))
+  }
+}
+
+function cleanAllMovies() {
+  moviesContainer.innerHTML = ''
+}
+
+async function searchMovieByName(title) {
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&language=en-US&query=${title}&page=1`
+  let response = await fetch(url)
+  const { results } = await response.json()
+
+  return results
+}
+
+async function getPopularMovies() {
+  let url = `https://api.themoviedb.org/3/movie/popular?api_key=${api_key}&language=en-US&page=1`
+  let response = await fetch(url)
+  const { results } = await response.json()
+
+  return results
+}
+
+window.onload = async function () {
+  const movies = await getPopularMovies()
   movies.forEach(movie => renderMovie(movie))
 }
 
 function renderMovie(movie) {
+  const { title, poster_path, vote_average: rating, release_date, overview: description } = movie;
+  const isFavorited = false
 
-  const { title, image, rating, year, description, isFavorited } = movie;
+  const year = new Date(release_date).getFullYear()
+  const image = poster_path ? `https://image.tmdb.org/t/p/w500${poster_path}` : 'https://criticalhits.com.br/wp-content/plugins/accelerated-mobile-pages/images/SD-default-image.png'
 
   const movieElement = document.createElement('li')
   movieElement.classList.add('movie')
-  movieContainer.appendChild(movieElement)
+  moviesContainer.appendChild(movieElement)
 
   const movieInformations = document.createElement('div')
   movieInformations.classList.add('movie-informations')
@@ -97,4 +117,4 @@ function renderMovie(movie) {
 
   movieElement.appendChild(movieInformations)
   movieElement.appendChild(movieDescriptionContainer)
-} 
+}
