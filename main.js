@@ -4,6 +4,7 @@ const moviesContainer = document.querySelector(".movies")
 const input = document.querySelector('input')
 const searchButton = document.querySelector('.searchIcon')
 
+
 searchButton.addEventListener('click', searchMovie)
 
 input.addEventListener('keyup', function (event) {
@@ -13,16 +14,86 @@ input.addEventListener('keyup', function (event) {
   }
 })
 
+input.addEventListener('focusout', (_) => {
+  if (!input.value) {
+    searchMovie()
+  }
+})
+
+if (localStorage.getItem('favoriteMovies') === null) {
+  localStorage.setItem('favoriteMovies', JSON.stringify([]))
+}
+
+function handlerClickFavoriteMovie() {
+  const favoriteButton = document.querySelectorAll('.favorite-image')
+  favoriteButton.forEach(favorite => {
+    favorite.addEventListener('click', () => {
+      const movieElement = favorite.parentElement.parentElement.parentElement.parentElement.parentElement
+      let image = movieElement.firstChild.firstChild.firstChild.src.slice(31)
+      let title = movieElement.firstChild.lastChild.firstChild.textContent
+      let year = title.slice(title.length - 6).replace('(', '').replace(')', '')
+      title = title.slice(0, title.length - 7)
+      let rating = movieElement.firstChild.lastChild.lastChild.firstChild.lastChild.textContent
+      let description = movieElement.lastChild.firstChild.textContent
+      let movieFavorite = movieElement.firstChild.lastChild.lastChild.lastChild.lastChild
+
+      const movie = {
+        'poster_path': image,
+        'title': title,
+        'release_date': year,
+        'vote_average': rating,
+        'overview': description,
+      }
+
+      if (isFavoriteMovie(title)) {
+        removeMovieFromLocalStorage(title)
+        favorite.src = 'assets/heart.svg'
+        movieFavorite.textContent = 'Favoritar'
+      } else {
+        saveMovieToLocalStorage(movie)
+        favorite.src = 'assets/heart-fill.svg'
+        movieFavorite.textContent = 'Desfavoritar'
+      }
+    })
+  })
+}
+
+function saveMovieToLocalStorage(movie) {
+  const movies = getFavoriteMovies()
+  movies.push(movie)
+  const moviesJSON = JSON.stringify(movies)
+  localStorage.setItem('favoriteMovies', moviesJSON)
+}
+
+function removeMovieFromLocalStorage(title) {
+  const movies = getFavoriteMovies()
+  let favorites = movies.filter(movie => movie.title !== title)
+  favorites = JSON.stringify(favorites)
+  localStorage.setItem('favoriteMovies', favorites)
+}
+
+function getFavoriteMovies() {
+  return JSON.parse(localStorage.getItem('favoriteMovies'))
+}
+
+function isFavoriteMovie(title) {
+  const movies = getFavoriteMovies()
+  const movie = movies.filter(movie => movie.title === title)
+  return movie.length >= 1
+}
+
 async function searchMovie() {
   const inputValue = input.value
   if (!!inputValue) {
     cleanAllMovies()
     const movies = await searchMovieByName(inputValue)
     movies.forEach(movie => renderMovie(movie))
+    handlerClickFavoriteMovie()
   } else {
     cleanAllMovies()
     const movies = await getPopularMovies()
     movies.forEach(movie => renderMovie(movie))
+    handlerClickFavoriteMovie()
   }
 }
 
@@ -49,11 +120,12 @@ async function getPopularMovies() {
 window.onload = async function () {
   const movies = await getPopularMovies()
   movies.forEach(movie => renderMovie(movie))
+  handlerClickFavoriteMovie()
 }
 
 function renderMovie(movie) {
   const { title, poster_path, vote_average: rating, release_date, overview: description } = movie;
-  const isFavorited = false
+  const isFavorited = isFavoriteMovie(title)
 
   const year = new Date(release_date).getFullYear()
   const image = poster_path ? `https://image.tmdb.org/t/p/w500${poster_path}` : 'https://criticalhits.com.br/wp-content/plugins/accelerated-mobile-pages/images/SD-default-image.png'
@@ -104,7 +176,7 @@ function renderMovie(movie) {
   favoriteImage.classList.add('favorite-image')
   const favoriteText = document.createElement('span')
   favoriteText.classList.add('movie-favorite')
-  favoriteText.textContent = 'Favoritar'
+  favoriteText.textContent = isFavorited ? 'Desfavoritar' : 'Favoritar'
   favorite.appendChild(favoriteImage)
   favorite.appendChild(favoriteText)
   informations.appendChild(favorite)
