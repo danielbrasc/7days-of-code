@@ -1,9 +1,27 @@
 import { api_key } from './environment/key.js'
 
-const moviesContainer = document.querySelector(".movies")
-const input = document.querySelector('input')
+const moviesContainer = document.querySelector('.movies')
+const input = document.querySelector('.input-container > input')
+const checkbox = document.querySelector('#onlyFavorites')
 const searchButton = document.querySelector('.searchIcon')
 
+if (localStorage.getItem('favoriteMovies') === null) {
+  localStorage.setItem('favoriteMovies', JSON.stringify([]))
+}
+
+checkbox.addEventListener('click', async function (_) {
+  const messageNoFavorites = document.querySelector('.no-favorites')
+  if (checkbox.checked) {
+    getFavoriteMovies().length === 0 ? messageNoFavorites.classList.remove('invisible') : messageNoFavorites.classList.add('invisible')
+    showOnlyFavoriteMovies()
+  } else {
+    cleanAllMovies()
+    messageNoFavorites.classList.add('invisible')
+    const movies = await getPopularMovies()
+    movies.forEach(movie => renderMovie(movie))
+    handlerClickFavoriteMovie()
+  }
+})
 
 searchButton.addEventListener('click', searchMovie)
 
@@ -20,8 +38,11 @@ input.addEventListener('focusout', (_) => {
   }
 })
 
-if (localStorage.getItem('favoriteMovies') === null) {
-  localStorage.setItem('favoriteMovies', JSON.stringify([]))
+async function showOnlyFavoriteMovies() {
+  const movies = await getFavoriteMovies()
+  cleanAllMovies()
+  movies.forEach(movie => renderMovie(movie))
+  handlerClickFavoriteMovie()
 }
 
 function handlerClickFavoriteMovie() {
@@ -127,7 +148,7 @@ function renderMovie(movie) {
   const { title, poster_path, vote_average: rating, release_date, overview: description } = movie;
   const isFavorited = isFavoriteMovie(title)
 
-  const year = new Date(release_date).getFullYear()
+  const year = new Date(release_date).getUTCFullYear()
   const image = poster_path ? `https://image.tmdb.org/t/p/w500${poster_path}` : 'https://criticalhits.com.br/wp-content/plugins/accelerated-mobile-pages/images/SD-default-image.png'
 
   const movieElement = document.createElement('li')
