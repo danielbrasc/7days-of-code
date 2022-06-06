@@ -20,7 +20,7 @@ function removeMovieFromLocalStorage(id) {
   const movies = getFavoriteMovies() || []
   const findMovie = movies.find(movie => movie.id == id)
   const newMovies = movies.filter(movie => movie.id != findMovie.id)
-  localStorage.setItem(favoriteMovies, JSON.stringify(newMovies))
+  localStorage.setItem(localStorageKey, JSON.stringify(newMovies))
 }
 
 export { saveMovieToLocalStorage, removeMovieFromLocalStorage, getFavoriteMovies, checkMovieIsFavorited }
