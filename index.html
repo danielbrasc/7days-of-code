@@ -10,7 +10,7 @@
   <body>
     <main id="main">
       <h2>Filmes Populares</h2>
-      <div class="input-container">
+      <form class="input-container">
         <input
           type="text"
           name="movie-name"
@@ -21,15 +21,12 @@
           alt="Ícone de pesquisa"
           class="searchIcon"
         />
-      </div>
+      </form>
       <div class="show-only-favorites">
-        <input type="checkbox" name="onlyFavorites" id="onlyFavorites" />
-        <label for="onlyFavorites">Mostrar meus filmes favoritos apenas</label>
+        <input type="checkbox" name="favoritesMovies" />
+        <label>Mostrar meus filmes favoritos apenas</label>
       </div>
       <ul class="movies"></ul>
-      <h3 class="no-favorites invisible">
-        Não há nenhum filme marcado como favorito
-      </h3>
     </main>
 
     <script type="module" src="main.js"></script>
