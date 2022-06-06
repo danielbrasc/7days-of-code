@@ -140,14 +140,3 @@ h2 {
   font-size: 0.85rem;
   line-height: 1.5rem;
 }
-
-.no-favorites {
-  margin-top: 10%;
-  text-align: center;
-  color: #FFF;
-  font-size: 1.4rem;
-}
-
-.invisible {
-  visibility: hidden;
-}

@@ -1,120 +1,35 @@
-import { api_key } from './environment/key.js'
+import { searchMovieByName, getPopularMovies } from './services/api.js'
+import { saveMovieToLocalStorage, removeMovieFromLocalStorage, getFavoriteMovies, checkMovieIsFavorited } from './services/localStorage.js'
 
 const moviesContainer = document.querySelector('.movies')
-const input = document.querySelector('.input-container > input')
-const checkbox = document.querySelector('#onlyFavorites')
+const form = document.querySelector('form')
 const searchButton = document.querySelector('.searchIcon')
+const checkboxInput = document.querySelector('input[type="checkbox"]')
 
-if (localStorage.getItem('favoriteMovies') === null) {
-  localStorage.setItem('favoriteMovies', JSON.stringify([]))
-}
-
-checkbox.addEventListener('click', async function (_) {
-  const messageNoFavorites = document.querySelector('.no-favorites')
-  if (checkbox.checked) {
-    getFavoriteMovies().length === 0 ? messageNoFavorites.classList.remove('invisible') : messageNoFavorites.classList.add('invisible')
-    showOnlyFavoriteMovies()
-  } else {
-    cleanAllMovies()
-    messageNoFavorites.classList.add('invisible')
-    const movies = await getPopularMovies()
-    movies.forEach(movie => renderMovie(movie))
-    handlerClickFavoriteMovie()
-  }
-})
-
+checkboxInput.addEventListener('change', checkCheckboxStatus)
 searchButton.addEventListener('click', searchMovie)
-
-input.addEventListener('keyup', function (event) {
-  if (event.keyCode == 13) {
-    searchMovie()
-    return
-  }
+form.addEventListener('submit', function (event) {
+  event.preventDefault()
+  searchMovie()
 })
 
-input.addEventListener('focusout', (_) => {
-  if (!input.value) {
-    searchMovie()
-  }
-})
-
-async function showOnlyFavoriteMovies() {
-  const movies = await getFavoriteMovies()
+function checkCheckboxStatus() {
+  const isChecked = checkboxInput.checked
   cleanAllMovies()
-  movies.forEach(movie => renderMovie(movie))
-  handlerClickFavoriteMovie()
-}
-
-function handlerClickFavoriteMovie() {
-  const favoriteButton = document.querySelectorAll('.favorite-image')
-  favoriteButton.forEach(favorite => {
-    favorite.addEventListener('click', () => {
-      const movieElement = favorite.parentElement.parentElement.parentElement.parentElement.parentElement
-      let image = movieElement.firstChild.firstChild.firstChild.src.slice(31)
-      let title = movieElement.firstChild.lastChild.firstChild.textContent
-      let year = title.slice(title.length - 6).replace('(', '').replace(')', '')
-      title = title.slice(0, title.length - 7)
-      let rating = movieElement.firstChild.lastChild.lastChild.firstChild.lastChild.textContent
-      let description = movieElement.lastChild.firstChild.textContent
-      let movieFavorite = movieElement.firstChild.lastChild.lastChild.lastChild.lastChild
-
-      const movie = {
-        'poster_path': image,
-        'title': title,
-        'release_date': year,
-        'vote_average': rating,
-        'overview': description,
-      }
-
-      if (isFavoriteMovie(title)) {
-        removeMovieFromLocalStorage(title)
-        favorite.src = 'assets/heart.svg'
-        movieFavorite.textContent = 'Favoritar'
-      } else {
-        saveMovieToLocalStorage(movie)
-        favorite.src = 'assets/heart-fill.svg'
-        movieFavorite.textContent = 'Desfavoritar'
-      }
-    })
-  })
-}
-
-function saveMovieToLocalStorage(movie) {
-  const movies = getFavoriteMovies()
-  movies.push(movie)
-  const moviesJSON = JSON.stringify(movies)
-  localStorage.setItem('favoriteMovies', moviesJSON)
-}
-
-function removeMovieFromLocalStorage(title) {
-  const movies = getFavoriteMovies()
-  let favorites = movies.filter(movie => movie.title !== title)
-  favorites = JSON.stringify(favorites)
-  localStorage.setItem('favoriteMovies', favorites)
-}
-
-function getFavoriteMovies() {
-  return JSON.parse(localStorage.getItem('favoriteMovies'))
-}
-
-function isFavoriteMovie(title) {
-  const movies = getFavoriteMovies()
-  const movie = movies.filter(movie => movie.title === title)
-  return movie.length >= 1
+  if (isChecked) {
+    const movies = getFavoriteMovies() || []
+    movies.forEach(movie => renderMovie(movie))
+  } else {
+    getAllPopularMovies()
+  }
 }
 
 async function searchMovie() {
   const inputValue = input.value
-  if (!!inputValue) {
+  if (inputValue != '') {
     cleanAllMovies()
     const movies = await searchMovieByName(inputValue)
     movies.forEach(movie => renderMovie(movie))
-    handlerClickFavoriteMovie()
-  } else {
-    cleanAllMovies()
-    const movies = await getPopularMovies()
-    movies.forEach(movie => renderMovie(movie))
-    handlerClickFavoriteMovie()
   }
 }
 
@@ -122,32 +37,39 @@ function cleanAllMovies() {
   moviesContainer.innerHTML = ''
 }
 
-async function searchMovieByName(title) {
-  const url = `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&language=en-US&query=${title}&page=1`
-  let response = await fetch(url)
-  const { results } = await response.json()
+function favoriteButtonPressed(event, movie) {
+  const image = event.target
+  const spanElement = image.nextElementSibling
 
-  return results
+  const favoriteStatus = {
+    favorited: 'assets/heart-fill.svg',
+    notFavorited: 'assets/heart.svg'
+  }
+
+  if (image.src.includes(favoriteStatus.notFavorited)) {
+    image.src = favoriteStatus.favorited
+    spanElement.innerText = 'Desfavoritar'
+    saveMovieToLocalStorage(movie)
+  } else {
+    image.src = favoriteStatus.notFavorited
+    spanElement.innerText = 'Favoritar'
+    removeMovieFromLocalStorage(movie.id)
+  }
 }
 
-async function getPopularMovies() {
-  let url = `https://api.themoviedb.org/3/movie/popular?api_key=${api_key}&language=en-US&page=1`
-  let response = await fetch(url)
-  const { results } = await response.json()
-
-  return results
-}
-
-window.onload = async function () {
+async function getAllPopularMovies() {
   const movies = await getPopularMovies()
   movies.forEach(movie => renderMovie(movie))
-  handlerClickFavoriteMovie()
+}
+
+window.onload = function () {
+  getAllPopularMovies()
 }
 
 function renderMovie(movie) {
-  const { title, poster_path, vote_average: rating, release_date, overview: description } = movie;
-  const isFavorited = isFavoriteMovie(title)
+  const { id, title, poster_path, vote_average, release_date, overview } = movie;
 
+  const isFavorited = checkMovieIsFavorited(id)
   const year = new Date(release_date).getUTCFullYear()
   const image = poster_path ? `https://image.tmdb.org/t/p/w500${poster_path}` : 'https://criticalhits.com.br/wp-content/plugins/accelerated-mobile-pages/images/SD-default-image.png'
 
@@ -184,7 +106,7 @@ function renderMovie(movie) {
   starImage.alt = 'Ícone de uma estrela'
   const movieRate = document.createElement('span')
   movieRate.classList.add('movie-rate')
-  movieRate.textContent = rating
+  movieRate.textContent = vote_average
   ratingContainer.appendChild(starImage)
   ratingContainer.appendChild(movieRate)
   informations.appendChild(ratingContainer)
@@ -192,9 +114,10 @@ function renderMovie(movie) {
   const favorite = document.createElement('div')
   favorite.classList.add('favorite')
   const favoriteImage = document.createElement('img')
+  favoriteImage.classList.add('favorite-image')
   favoriteImage.src = isFavorited ? 'assets/heart-fill.svg' : 'assets/heart.svg'
   favoriteImage.alt = 'Ícone de um coração'
-  favoriteImage.classList.add('favorite-image')
+  favoriteImage.addEventListener('click', (event) => favoriteButtonPressed(event, movie))
   const favoriteText = document.createElement('span')
   favoriteText.classList.add('movie-favorite')
   favoriteText.textContent = isFavorited ? 'Desfavoritar' : 'Favoritar'
@@ -205,7 +128,7 @@ function renderMovie(movie) {
   const movieDescriptionContainer = document.createElement('div')
   movieDescriptionContainer.classList.add('movie-description')
   const movieDescription = document.createElement('span')
-  movieDescription.textContent = description
+  movieDescription.textContent = overview
   movieDescriptionContainer.appendChild(movieDescription)
 
   movieElement.appendChild(movieInformations)
