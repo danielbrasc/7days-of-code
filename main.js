@@ -65,9 +65,9 @@ async function getAllPopularMovies() {
 }
 
 window.onload = function () {
-  getAllPopularMovies()
   // renderizar um array com os 20 filmes
-  renderArrayMovies()
+  renderArrayMovies()  
+  // getAllPopularMovies()
 }
 
 function renderMovie(movie) {
